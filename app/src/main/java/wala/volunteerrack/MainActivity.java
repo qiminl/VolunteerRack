@@ -2,6 +2,7 @@ package wala.volunteerrack;
 
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 
 import android.support.v7.app.AppCompatActivity;
@@ -43,7 +44,6 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-
     /**
      * For Menu options in Toolbar
      * @param menu Menu item.
@@ -67,8 +67,12 @@ public class MainActivity extends AppCompatActivity {
     }
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
+        if (item.getItemId() == android.R.id.home) {
+            Log.d("debug", "home key pressed");
+        }
         if(item.getItemId() == item1_id){
             Log.d("debug","Menu Item Selected :" + item.getItemId());
+
             Log.d("debug", "fragments # =" + getSupportFragmentManager().getFragments().size());
             List<Fragment> fl = getSupportFragmentManager().getFragments();
             for(Fragment f : fl)
@@ -79,4 +83,11 @@ public class MainActivity extends AppCompatActivity {
 
         return super.onOptionsItemSelected(item);
     }
+
+    public void setTitle(String title) {
+        Title = title;
+        toolbar.setTitle(title);
+        Log.d("debug","set title clicked");
+    }
+
 }

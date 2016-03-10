@@ -19,6 +19,7 @@ import android.widget.TextView;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+import wala.volunteerrack.MainActivity;
 import wala.volunteerrack.R;
 import wala.volunteerrack.SlidingTabLayout;
 
@@ -31,6 +32,7 @@ public class tabBasicFragment extends Fragment {
     private ViewPager mViewPager;
     private TabLayout tabLayout;
     private SamplePagerAdapter samplePagerAdapter;
+    private static int currentPage = 0;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -40,7 +42,6 @@ public class tabBasicFragment extends Fragment {
 
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
-        // BEGIN_INCLUDE (setup_viewpager)
         // Get the ViewPager and set it's PagerAdapter so that it can display items
         samplePagerAdapter = new SamplePagerAdapter();
 
@@ -48,33 +49,77 @@ public class tabBasicFragment extends Fragment {
         //set how many page should be load each time (including background view)
         mViewPager.setOffscreenPageLimit(1);
         mViewPager.setAdapter(samplePagerAdapter);
-        // END_INCLUDE (setup_viewpager)
+        mViewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+            @Override
+            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+            }
 
-        // BEGIN_INCLUDE (setup_slidingtablayout)
-        // Give the SlidingTabLayout the ViewPager, this must be done AFTER the ViewPager has had
-        // it's PagerAdapter set.
-        //mSlidingTabLayout = (SlidingTabLayout) view.findViewById(R.id.sliding_tabs);
-        //mSlidingTabLayout.setViewPager(mViewPager);
-        // END_INCLUDE (setup_slidingtablayout)
+            @Override
+            public void onPageSelected(int position) {
+                Log.i(LOG_TAG, "page selected " + position);
+                currentPage = position;
+            }
 
+            @Override
+            public void onPageScrollStateChanged(int state) {
 
-        //getListView().setOnItemClickListener(this);
+            }
+        });
 
         tabLayout = (TabLayout) view.findViewById(R.id.sliding_tabs);
         tabLayout.setupWithViewPager(mViewPager);
+        tabLayout.setOnTabSelectedListener(new TabLayout.ViewPagerOnTabSelectedListener(mViewPager) {
+            @Override
+            public void onTabSelected(TabLayout.Tab tab) {
+                super.onTabSelected(tab);
+                String text = "";
+                if (tab.getText() != null) {
+                    text = (String) tab.getText();
+                    switch (text) {
+                        case "Opportunity":
+                            ((MainActivity) getActivity()).setTitle("Opportunity");
+                            Log.d("debug", "case " + tab.getText() + " title: " + "Opportunity");
+                            break;
+                        case "Event":
+                            ((MainActivity) getActivity()).setTitle("Event");
+                            Log.d("debug", "case " + tab.getText() + " title: " + "Event");
+                            break;
+                        case "Collaborator":
+                            ((MainActivity) getActivity()).setTitle("Collaborator");
+                            Log.d("debug", "case " + tab.getText() + " title: " + "Collaborator");
+                            break;
+                        case "Volunteer":
+                            ((MainActivity) getActivity()).setTitle("Volunteer");
+                            Log.d("debug", "case " + tab.getText() + " title: " + "Volunteer");
+                            break;
+                        case "Details":
+                            ((MainActivity) getActivity()).setTitle("Details");
+                            Log.d("debug", "case " + tab.getText() + " title: " + "Details");
+                            break;
+                        default:
+                            ((MainActivity) getActivity()).setTitle("Volunteer Rack");
+                            Log.d("debug", "case " + tab.getText() + " title: " + "Volunteer Rack");
+
+                    }
+                }
+            }
+
+            @Override
+            public void onTabUnselected(TabLayout.Tab tab) {
+
+            }
+
+            @Override
+            public void onTabReselected(TabLayout.Tab tab) {
+
+            }
+        });
         setupTabIcons();
     }
 
     @Override
     public void onResume() {
         super.onResume();
-        /*
-        try {
-            long id = getListView().getItemIdAtPosition(0);
-            Log.d("debug","list item id @ position 0" +id);
-        }
-        catch (Exception e){Log.d("debug","list failed" +e);}
-        */
     }
 
     /**
@@ -82,6 +127,8 @@ public class tabBasicFragment extends Fragment {
      */
     private void setupTabIcons() {
         try{
+            //create an hidden tab for start page if needed
+
             TextView tabOne = (TextView) LayoutInflater.from(getActivity()).inflate(R.layout.custom_tab, null);
             tabOne.setText("Opportunity");
             tabOne.setCompoundDrawablesWithIntrinsicBounds(0, R.drawable.ic_tab_favourite, 0, 0);
@@ -101,6 +148,7 @@ public class tabBasicFragment extends Fragment {
             tabFour.setText("Volunteer");
             tabFour.setCompoundDrawablesWithIntrinsicBounds(0, R.drawable.ic_tab_contacts, 0, 0);
             tabLayout.getTabAt(3).setCustomView(tabFour);
+
         }catch (NullPointerException e){
             //todo handle null pointer exc
             Log.d("debug","null pointer @ setupTabIcons");
@@ -118,14 +166,20 @@ public class tabBasicFragment extends Fragment {
      * #4 is opportunity details
      * #5 is collaborator details
      */
-    class SamplePagerAdapter extends PagerAdapter {
+    public class SamplePagerAdapter extends PagerAdapter {
+        ArrayList< View> viewsList = new ArrayList<>();
+        private View currentView;
+        private int opportunityDetails = 0;
+        public void setOppertunityDetails(int position){
+            opportunityDetails = position;
+        }
 
         //todo need to be modify in order to delete view correctly
         @Override
         public int getItemPosition(Object object) {
-            return super.getItemPosition(object);
+            return  POSITION_NONE;
+            //return super.getItemPosition(object);
         }
-
         /**
          * @return the number of pages to display
          */
@@ -153,7 +207,28 @@ public class tabBasicFragment extends Fragment {
          */
         @Override
         public CharSequence getPageTitle(int position) {
-            return "Item " + (position + 1);
+            String title;
+            switch (position){
+                case 0:
+                    title = "Opportunity";
+                    break;
+                case 1:
+                    title = "Event";
+                    break;
+                case 2:
+                    title = "Collaborator";
+                    break;
+                case 3:
+                    title = "Volunteer";
+                    break;
+                case 4:
+                    title = "Details";
+                    break;
+                default:
+                    title = "Volunteer Rack";
+            }
+            return title;
+            //return "Item " + (position + 1);
         }
         // END_INCLUDE (pageradapter_getpagetitle)
 
@@ -164,77 +239,48 @@ public class tabBasicFragment extends Fragment {
         @Override
         public Object instantiateItem(ViewGroup container, int position) {
             View view;
+            MainActivity mainActivity = (MainActivity)getActivity();
+            MyTabViews myTabViews = new MyTabViews(mainActivity, samplePagerAdapter, container,position);
             switch (position){
                 case 0:
-                    view = getActivity().getLayoutInflater().inflate(R.layout.pager_item,
+                    view = getActivity().getLayoutInflater().inflate(R.layout.opportunity_view,
                             container, false);
-                    getActivity().setTitle("Opportunity");
+                    myTabViews.opportunityView(view, position, currentView);
+                    currentView = view;
                     break;
                 case 1:
                     view = getActivity().getLayoutInflater().inflate(R.layout.pager_item_test,
                             container, false);
-                    getActivity().setTitle("Event");
+                    myTabViews.eventView(view, position);
+                    currentView = view;
                     break;
                 case 2:
-                    view = getActivity().getLayoutInflater().inflate(R.layout.pager_item_test,
+                    view = getActivity().getLayoutInflater().inflate(R.layout.collaborator_view,
                             container, false);
-
-                    getActivity().setTitle("Collaborator");
+                    myTabViews.collaboratorView(view, position);
+                    currentView = view;
                     break;
                 case 3:
                     view = getActivity().getLayoutInflater().inflate(R.layout.pager_item_test,
                             container, false);
-
-                    getActivity().setTitle("Volunteer");
+                    myTabViews.volunteerView(view, position);
+                    currentView = view;
                     break;
                 case 4:
                     view = getActivity().getLayoutInflater().inflate(R.layout.pager_item_test4,
                             container, false);
-
-                    getActivity().setTitle("Details");
+                    myTabViews.detailsView(view, position, opportunityDetails, currentView);
+                    //currentView = view;
                     break;
                 default:
                     view = getActivity().getLayoutInflater().inflate(R.layout.pager_item,
                             container, false);
+                    view.setTag("Volunteer Rack");
+                    ((MainActivity)getActivity()).setTitle("Volunteer Rack");
 
-                    getActivity().setTitle("Volunteer Rack");
+                    Log.d("debug", "case " + position + " title: " + "Volunteer Rack");
                     break;
             }
-            // Inflate a new layout from our resources
-            //view = getActivity().getLayoutInflater().inflate(R.layout.pager_item,
-            //        container, false);
-            // Add the newly created View to the ViewPager
-            container.addView(view);
-
-            // Retrieve a TextView from the inflated View, and update it's text
-            TextView description = (TextView) view.findViewById(R.id.item_title);
-            //title.setText(String.valueOf(position + 1));
-            String tempDescription = "1!";
-            description.setText(tempDescription);
-
-            ArrayList<String> list = new ArrayList<>();
-            list.add("comment 1");list.add("comment 2");list.add("comment 3");list.add("comment 4");
-            //todo may change as using dynamic input
-            StableArrayAdapter listAdapter = new StableArrayAdapter(getActivity(),R.layout.item_in_list,list);
-            //ArrayAdapter<String> listAdapter = new ArrayAdapter<String>(getActivity(),R.layout.item_in_list, list);
-            ListView listView = (ListView)view.findViewById(R.id.list);
-            listView.setAdapter(listAdapter);
-            listView.setOnItemClickListener(new AdapterView.OnItemClickListener(){
-                @Override
-                /**
-                 * position and id is the position inside list view, referring to list item
-                 * View is
-                 * parent is the AdapterView, as the container of the actual view page area.
-                 */
-                public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                    Log.i(LOG_TAG, "On item click view tag is : " + view.getTag() );
-                    Log.i(LOG_TAG, "On item click view id is : " + view.getId() );
-                    samplePagerAdapter.instantiateItem((ViewGroup)parent.getParent(), 4);
-                }
-            });
-
-            Log.i(LOG_TAG, "instantiateItem() [position: " + position + "]");
-            // Return the View
             return view;
         }
 
@@ -244,73 +290,12 @@ public class tabBasicFragment extends Fragment {
          */
         @Override
         public void destroyItem(ViewGroup container, int position, Object object) {
+
+            Log.i(LOG_TAG, "container.getChildCount() =  " + container.getChildCount());
             container.removeView((View) object);
+            viewsList.remove((View) object);
             Log.i(LOG_TAG, "destroyItem() [position: " + position + "]");
         }
-    }
-
-
-
-    /**
-     * StableArrayAdapter class is used to implement a sub view of the ListView.
-     * customize with pic & text & location.
-     * todo make this class as a public abstract that implement by each fragment
-     */
-    private class StableArrayAdapter extends ArrayAdapter<String> {
-        HashMap< Integer, String> mIdMap = new HashMap< Integer, String>();
-        private final Context context;
-
-        public StableArrayAdapter(Context context, int textViewResourceId,
-                                  ArrayList<String> company_list) {
-
-            super(context, textViewResourceId, company_list);
-            this.context = context;
-            for (int i = 0; i < company_list.size(); ++i) {
-                mIdMap.put(i, company_list.get(i));
-            }
-        }
-
-        /*@Override
-        public long getItemId(int position) {
-            Diary item = getItem(position);
-            return mIdMap.get(item);
-        }
-        @Override
-        public boolean hasStableIds() {
-            return true;
-        }*/
-
-        @Override
-        public View getView(int position, View convertView, ViewGroup parent) {
-            LayoutInflater inflater = (LayoutInflater) context
-                    .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-
-            View rowView = inflater.inflate(R.layout.item_in_list, parent, false);
-
-            TextView textView = (TextView) rowView.findViewById(R.id.text1);
-            ImageView imageView = (ImageView) rowView.findViewById(R.id.image1);
-            imageView.setAdjustViewBounds(true);//adjust ratio
-
-            String company = mIdMap.get(position);
-            //todo handle image properly, image online or local sd or sqlite
-            if(company != null){
-                textView.setText(company);
-                switch (company.toLowerCase()){
-                    case "company 1":
-                        imageView.setImageResource(R.drawable.testpic);
-                        break;
-                    case "company 2":
-                        imageView.setImageResource(R.drawable.testpic2);
-                        break;
-                    default:
-                        imageView.setImageResource(R.drawable.testpic3);
-                        break;
-                }
-            }
-            //MediaStore.Images.Media.insertImage(getContentResolver(), yourBitmap, yourTitle , yourDescription);
-            return rowView;
-        }
-
     }
 
 }
