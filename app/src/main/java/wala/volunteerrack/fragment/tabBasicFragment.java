@@ -1,6 +1,5 @@
 package wala.volunteerrack.fragment;
 
-import android.content.Context;
 import android.os.Bundle;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
@@ -10,14 +9,10 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
-import android.widget.ImageView;
-import android.widget.ListView;
+import android.widget.FrameLayout;
 import android.widget.TextView;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 
 import wala.volunteerrack.MainActivity;
 import wala.volunteerrack.R;
@@ -32,7 +27,13 @@ public class tabBasicFragment extends Fragment {
     private ViewPager mViewPager;
     private TabLayout tabLayout;
     private SamplePagerAdapter samplePagerAdapter;
+
+    private ArrayList<View> view_list = new ArrayList<>();
+
+    private MainPagerAdapter pagerAdapter = null;
     private static int currentPage = 0;
+
+    private int opportunityDetails = 0;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -41,13 +42,26 @@ public class tabBasicFragment extends Fragment {
     }
 
     @Override
-    public void onViewCreated(View view, Bundle savedInstanceState) {
+    public void onViewCreated(final View view, Bundle savedInstanceState) {
+
+
         // Get the ViewPager and set it's PagerAdapter so that it can display items
-        samplePagerAdapter = new SamplePagerAdapter();
+        //samplePagerAdapter = new SamplePagerAdapter();
+
+        pagerAdapter = new MainPagerAdapter();
+        LayoutInflater inflater = getActivity().getLayoutInflater();
+        FrameLayout v0 = (FrameLayout) inflater.inflate (R.layout.frame_layout, null);
+        TextView tv = (TextView)v0.findViewById(R.id.text);
+        tv.setText("diudiduiududidu\n diudiudiud\n");
+        pagerAdapter.addView(v0, 0);
+        FrameLayout v1 = (FrameLayout) inflater.inflate (R.layout.frame_layout, null);
+        TextView tv1 = (TextView)v0.findViewById(R.id.text);
+        tv.setText("diudiduiududidu\n diudiudiud\n");
+        pagerAdapter.addView(v1, 1);
 
         mViewPager = (ViewPager) view.findViewById(R.id.viewpager);
         //set how many page should be load each time (including background view)
-        mViewPager.setOffscreenPageLimit(1);
+        //mViewPager.setOffscreenPageLimit(1);
         mViewPager.setAdapter(samplePagerAdapter);
         mViewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
             @Override
@@ -66,22 +80,41 @@ public class tabBasicFragment extends Fragment {
             }
         });
 
+        //pagerAdapter.notifyDataSetChanged();
+        mViewPager.setCurrentItem(pagerAdapter.getItemPosition(v1), true);
+        Log.d("debug", "item position of v0" + pagerAdapter.getItemPosition(v0));
+
+        Log.d("debug","item numbers"+pagerAdapter.getCount());
+        /*
+        view_list = CreateViewList(mViewPager);
+        for(View i :view_list)
+            pagerAdapter.addView(i, view_list.indexOf(i));
+        pagerAdapter.notifyDataSetChanged();
+        setCurrentPage(view_list.get(0));
+       */
+
+
+
+        //for(View i:view_list)  pagerAdapter.addView(i);
+
         tabLayout = (TabLayout) view.findViewById(R.id.sliding_tabs);
-        tabLayout.setupWithViewPager(mViewPager);
+        //tabLayout.setupWithViewPager(mViewPager);
         tabLayout.setOnTabSelectedListener(new TabLayout.ViewPagerOnTabSelectedListener(mViewPager) {
             @Override
             public void onTabSelected(TabLayout.Tab tab) {
                 super.onTabSelected(tab);
                 String text = "";
-                if (tab.getText() != null) {
-                    text = (String) tab.getText();
+                if (tab.getTag() != null) {
+                    text = (String) tab.getTag();
                     switch (text) {
                         case "Opportunity":
                             ((MainActivity) getActivity()).setTitle("Opportunity");
+                            mViewPager.setCurrentItem(0);
                             Log.d("debug", "case " + tab.getText() + " title: " + "Opportunity");
                             break;
                         case "Event":
                             ((MainActivity) getActivity()).setTitle("Event");
+                            mViewPager.setCurrentItem(1);
                             Log.d("debug", "case " + tab.getText() + " title: " + "Event");
                             break;
                         case "Collaborator":
@@ -99,7 +132,6 @@ public class tabBasicFragment extends Fragment {
                         default:
                             ((MainActivity) getActivity()).setTitle("Volunteer Rack");
                             Log.d("debug", "case " + tab.getText() + " title: " + "Volunteer Rack");
-
                     }
                 }
             }
@@ -116,10 +148,28 @@ public class tabBasicFragment extends Fragment {
         });
         setupTabIcons();
     }
+    private ArrayList<View> CreateViewList(ViewGroup container){
+        ArrayList<View> view_list = new ArrayList<>();
+        MainActivity mainActivity = (MainActivity)getActivity();
+        MyTabViews myTabViews = new MyTabViews(mainActivity, samplePagerAdapter);
 
-    @Override
-    public void onResume() {
-        super.onResume();
+        View opportunityView = getActivity().getLayoutInflater().inflate(R.layout.opportunity_view,
+                        container, false);
+        View eventView = getActivity().getLayoutInflater().inflate(R.layout.pager_item_test,
+                container, false);
+        View collaboratorView = getActivity().getLayoutInflater().inflate(R.layout.collaborator_view,
+                container, false);
+        View volunteerView = getActivity().getLayoutInflater().inflate(R.layout.pager_item_test,
+                container, false);
+        View detailsView = getActivity().getLayoutInflater().inflate(R.layout.pager_item_test4,
+                container, false);
+
+        view_list.add(0,myTabViews.opportunityView(opportunityView, 0));
+        view_list.add(1,myTabViews.eventView(eventView, 1));
+        view_list.add(2, myTabViews.collaboratorView(collaboratorView, 2));
+        view_list.add(3,myTabViews.volunteerView(volunteerView, 3));
+        view_list.add(4,myTabViews.detailsView(detailsView, 4, opportunityDetails));
+        return view_list;
     }
 
     /**
@@ -132,28 +182,72 @@ public class tabBasicFragment extends Fragment {
             TextView tabOne = (TextView) LayoutInflater.from(getActivity()).inflate(R.layout.custom_tab, null);
             tabOne.setText("Opportunity");
             tabOne.setCompoundDrawablesWithIntrinsicBounds(0, R.drawable.ic_tab_favourite, 0, 0);
-            tabLayout.getTabAt(0).setCustomView(tabOne);
+            tabLayout.addTab(tabLayout.newTab().setCustomView(tabOne));
+            tabLayout.getTabAt(0).setTag("Opportunity");
+            //tabLayout.getTabAt(0).setCustomView(tabOne);
 
             TextView tabTwo = (TextView) LayoutInflater.from(getActivity()).inflate(R.layout.custom_tab, null);
             tabTwo.setText("Event");
             tabTwo.setCompoundDrawablesWithIntrinsicBounds(0, R.drawable.ic_tab_call, 0, 0);
-            tabLayout.getTabAt(1).setCustomView(tabTwo);
+            tabLayout.addTab(tabLayout.newTab().setCustomView(tabTwo));
+            tabLayout.getTabAt(1).setTag("Event");
+            //tabLayout.getTabAt(1).setCustomView(tabTwo);
 
             TextView tabThree = (TextView) LayoutInflater.from(getActivity()).inflate(R.layout.custom_tab, null);
             tabThree.setText("Collaborator");
             tabThree.setCompoundDrawablesWithIntrinsicBounds(0, R.drawable.ic_tab_contacts, 0, 0);
-            tabLayout.getTabAt(2).setCustomView(tabThree);
+            tabLayout.addTab(tabLayout.newTab().setCustomView(tabThree));
+            tabLayout.getTabAt(2).setTag("Collaborator");
+            //tabLayout.getTabAt(2).setCustomView(tabThree);
 
             TextView tabFour = (TextView) LayoutInflater.from(getActivity()).inflate(R.layout.custom_tab, null);
             tabFour.setText("Volunteer");
             tabFour.setCompoundDrawablesWithIntrinsicBounds(0, R.drawable.ic_tab_contacts, 0, 0);
-            tabLayout.getTabAt(3).setCustomView(tabFour);
-
+            tabLayout.addTab(tabLayout.newTab().setCustomView(tabFour));
+            tabLayout.getTabAt(3).setTag("Volunteer");
+            //tabLayout.getTabAt(3).setCustomView(tabFour);
         }catch (NullPointerException e){
             //todo handle null pointer exc
             Log.d("debug","null pointer @ setupTabIcons");
         }
     }
+
+    //-----------------------------------------------------------------------------
+    // Here's what the app should do to add a view to the ViewPager.
+    public void addView (View newPage)
+    {
+        int pageIndex = pagerAdapter.addView (newPage);
+        // You might want to make "newPage" the currently displayed page:
+        mViewPager.setCurrentItem (pageIndex, true);
+    }
+
+    //-----------------------------------------------------------------------------
+    // Here's what the app should do to remove a view from the ViewPager.
+    public void removeView (View defunctPage)
+    {
+        int pageIndex = pagerAdapter.removeView (mViewPager, defunctPage);
+        // You might want to choose what page to display, if the current page was "defunctPage".
+        if (pageIndex == pagerAdapter.getCount())
+            pageIndex--;
+        mViewPager.setCurrentItem (pageIndex);
+    }
+
+    //-----------------------------------------------------------------------------
+    // Here's what the app should do to get the currently displayed page.
+    public View getCurrentPage ()
+    {
+        return pagerAdapter.getView (mViewPager.getCurrentItem());
+    }
+
+    //-----------------------------------------------------------------------------
+    // Here's what the app should do to set the currently displayed page.  "pageToShow" must
+    // currently be in the adapter, or this will crash.
+    public void setCurrentPage (View pageToShow)
+    {
+        Log.d("debug", " position of page to show"+pagerAdapter.getItemPosition (pageToShow));
+        mViewPager.setCurrentItem(pagerAdapter.getItemPosition(pageToShow), true);
+    }
+
 
     /**
      * The {@link android.support.v4.view.PagerAdapter} used to display pages in this sample.
@@ -170,6 +264,7 @@ public class tabBasicFragment extends Fragment {
         ArrayList< View> viewsList = new ArrayList<>();
         private View currentView;
         private int opportunityDetails = 0;
+
         public void setOppertunityDetails(int position){
             opportunityDetails = position;
         }
@@ -180,6 +275,7 @@ public class tabBasicFragment extends Fragment {
             return  POSITION_NONE;
             //return super.getItemPosition(object);
         }
+
         /**
          * @return the number of pages to display
          */

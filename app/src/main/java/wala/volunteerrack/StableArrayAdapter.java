@@ -33,16 +33,6 @@ public class StableArrayAdapter extends ArrayAdapter<String> {
         }
     }
 
-    /*@Override
-    public long getItemId(int position) {
-        Diary item = getItem(position);
-        return mIdMap.get(item);
-    }
-    @Override
-    public boolean hasStableIds() {
-        return true;
-    }*/
-
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
         LayoutInflater inflater = (LayoutInflater) context
@@ -59,11 +49,20 @@ public class StableArrayAdapter extends ArrayAdapter<String> {
         if(company != null){
             textView.setText(company);
             switch (company.toLowerCase()){
-                case "company 1":
-                    imageView.setImageResource(R.drawable.testpic);
+                case "do what you love":
+                    imageView.setImageResource(R.drawable.dowhatyoulove);
                     break;
-                case "company 2":
-                    imageView.setImageResource(R.drawable.testpic2);
+                case "social diversity":
+                    imageView.setImageResource(R.drawable.sdc);
+                    break;
+                case "tian -jin temple":
+                    imageView.setImageResource(R.drawable.tjt);
+                    break;
+                case "cscf":
+                    imageView.setImageResource(R.drawable.cscf);
+                    break;
+                case "xinviteer":
+                    imageView.setImageResource(R.drawable.xinviteer);
                     break;
                 default:
                     imageView.setImageResource(R.drawable.testpic3);

@@ -2,7 +2,6 @@ package wala.volunteerrack;
 
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 
 import android.support.v7.app.AppCompatActivity;
@@ -13,7 +12,7 @@ import android.view.MenuItem;
 
 import java.util.List;
 
-import wala.volunteerrack.fragment.tabBasicFragment;
+import wala.volunteerrack.fragment.testFragment;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -38,7 +37,8 @@ public class MainActivity extends AppCompatActivity {
          */
         if (savedInstanceState == null) {
             FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-            tabBasicFragment fragment = new tabBasicFragment();
+            //tabBasicFragment fragment = new tabBasicFragment();
+            testFragment fragment = new testFragment();
             transaction.replace(R.id.sample_content_fragment, fragment);
             transaction.commit();
         }
