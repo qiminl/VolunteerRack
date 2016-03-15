@@ -12,12 +12,6 @@
           android:layout_weight="0.9"
           android:background="@android:color/white"/>
 
-
-    <View
-        android:layout_width="match_parent"
-        android:layout_height="10dp"
-        android:background="@android:color/darker_gray" />
-
     <android.support.design.widget.TabLayout
         android:background="?attr/colorPrimary"
         android:theme="@style/MyMaterialTheme"

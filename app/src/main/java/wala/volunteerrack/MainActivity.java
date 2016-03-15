@@ -32,6 +32,9 @@ public class MainActivity extends AppCompatActivity {
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         Log.d("debug","aMain activity created");
 
+        DBHandler myDiaryDBHandler = new DBHandler(this);
+        //myDiaryDBHandler.addComment();
+
         /**
          * In this case, we only handle newly created activity.
          */

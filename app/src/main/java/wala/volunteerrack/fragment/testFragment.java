@@ -1,6 +1,7 @@
 package wala.volunteerrack.fragment;
 
 import android.os.Bundle;
+import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.view.ViewPager;
@@ -17,6 +18,7 @@ import android.widget.TextView;
 
 import java.util.ArrayList;
 
+import wala.volunteerrack.DBHandler;
 import wala.volunteerrack.MainActivity;
 import wala.volunteerrack.R;
 import wala.volunteerrack.StableArrayAdapter;
@@ -32,6 +34,7 @@ public class testFragment extends Fragment{
     private View opportunityView, opportunityDetailsView,volunteerRackView;
     private View eventView, collaboratorView, volunteerView;
 
+    private int like_num;
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -40,6 +43,8 @@ public class testFragment extends Fragment{
 
     @Override
     public void onViewCreated(final View view, Bundle savedInstanceState) {
+
+
         pagerAdapter = new MainPagerAdapter();
         pager = (ViewPager) view.findViewById(R.id.viewpager);
         pager.setAdapter (pagerAdapter);
@@ -165,9 +170,10 @@ public class testFragment extends Fragment{
     private void setuptViews(){
         LayoutInflater inflater = getActivity().getLayoutInflater();
 
+        //opportunityView
         opportunityView = (View)  getActivity().getLayoutInflater().inflate (R.layout.opportunity_view, null);
         ArrayList<String> list = new ArrayList<>();
-        list.add("comment 1");list.add("comment 2");list.add("comment 3");list.add("comment 4");
+        list.add("Opportunity 1");list.add("Opportunity 2");list.add("Opportunity 3");list.add("Opportunity 4");
         //todo may change as using dynamic input
         StableArrayAdapter listAdapter = new StableArrayAdapter(getActivity(),R.layout.item_in_list,list);
         //ArrayAdapter<String> listAdapter = new ArrayAdapter<String>(getActivity(),R.layout.item_in_list, list);
@@ -185,10 +191,13 @@ public class testFragment extends Fragment{
         });
 
 
+        //eventView
         eventView = (View) inflater.inflate (R.layout.frame_layout, null);
         TextView tv1 = (TextView) eventView.findViewById(R.id.text);
         tv1.setText("eventView \n \n \n eventView");
 
+
+        // collaboratorView
         collaboratorView = (View) inflater.inflate (R.layout.collaborator_view, null);
         ArrayList<String> list2 = new ArrayList<>();
         list2.add("Do What You Love");list2.add("Social diversity");list2.add("Tian -Jin Temple");
@@ -199,17 +208,41 @@ public class testFragment extends Fragment{
         ListView listView2 = (ListView)collaboratorView.findViewById(R.id.list);
         listView2.setAdapter(listAdapter2);
 
+
+        //volunteerView
         volunteerView = (View) inflater.inflate (R.layout.frame_layout, null);
         TextView tv3 = (TextView) volunteerView.findViewById(R.id.text);
         tv3.setText("volunteerView \n \n \n biubiubiu");
 
+
+        //opportunityDetailsView
+        like_num = 1024;
         opportunityDetailsView = (View) inflater.inflate (R.layout.details_view, null);
-        volunteerRackView = (View) inflater.inflate (R.layout.volunteer_rack, null);
+        FloatingActionButton fab = (FloatingActionButton) opportunityDetailsView.findViewById(R.id.fab);
+        fab.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View v) {
+                TextView tv = (TextView)opportunityDetailsView.findViewById(R.id.like);
+                like_num += 1;
+                tv.setText("Like: +" + like_num);
+            }
+        });
+        FloatingActionButton comment = (FloatingActionButton) opportunityDetailsView.findViewById(R.id.comment);
+        TextView like = (TextView) opportunityDetailsView.findViewById(R.id.like);
+        like.setText("Like: +" + like_num);
+
+
+        //volunteerRackView
+        volunteerRackView = (View) inflater.inflate(R.layout.volunteer_rack, null);
         ImageView img =(ImageView) volunteerRackView.findViewById(R.id.img);
         img.setImageResource(R.drawable.volunteer_rack);
 
+
         pagerAdapter.addView(volunteerRackView, 0);
     }
+
+    public void creatOpportunityDetais(){}
+
         //-----------------------------------------------------------------------------
     // Here's what the app should do to add a view to the ViewPager.
     public void addView (View newPage)
